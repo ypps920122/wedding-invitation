@@ -205,7 +205,7 @@
 
         <!-- 漫畫格子照片 -->
         <section class="bg-black">
-            <img src="https://share.google/AqVDUN10sLItee9E0" alt="婚紗照" class="w-full block">
+            <img src="O60A5405.jpg" alt="" class="w-full block">
         </section>
 
         <!-- 地點資訊 -->
@@ -217,7 +217,7 @@
                     <p class="text-xl">CHALET V</p>
                     <p class="text-sm text-gray-600">台北市中山區植福路8號</p>
                     <p class="text-xs text-gray-400">(典華後方大木門)</p>
-                    <a href="https://share.google/AqVDUN10sLItee9E0" target="_blank" class="block mt-4 border-4 border-black overflow-hidden">
+                    <a href="https://maps.app.goo.gl/2PpvpmS51fFe2QeDA" target="_blank" class="block mt-4 border-4 border-black overflow-hidden">
                         <img src="map.jpg" alt="" class="w-full block">
                         <div class="bg-black text-white text-center py-3 hover:bg-white hover:text-black transition duration-200">
                             查看地圖 <span class="text-xs opacity-70">MAP</span>
@@ -339,11 +339,11 @@
 
         <!-- 提示訊息 -->
         <section class="px-6 py-8 border-t-4 border-dashed border-gray-300 text-center">
-            <p class="font-black text-sm text-gray-500 leading-relaxed">
+            <p class="font-black text-xs text-gray-500 leading-relaxed">
                 ✦ 婚禮前兩週，我們會再寄出詳細的婚禮流程與當日資訊，<br>
                 並與各位確認最終的餐點選擇，届時再請留意通知喔！✦
             </p>
-            <p class="text-[10px] text-gray-400 font-bold mt-2 leading-relaxed">
+            <p class="text-[9px] text-gray-400 font-bold mt-2 leading-relaxed">
                 Two weeks before the wedding, we'll send out the detailed schedule<br>
                 and confirm your meal selections. Stay tuned!
             </p>
@@ -451,7 +451,7 @@
 
                 card.innerHTML = `
                     <div class="flex items-center gap-2">
-                        <span class="bg-black text-white text-xs px-2 py-1 font-black whitespace-nowrap">G${i}</span>
+                        <span class="bg-black text-white text-xs px-2 py-1 font-black whitespace-nowrap">GUEST ${i}</span>
                         <input type="text" placeholder="姓名" class="flex-1 font-black outline-none text-sm border-b-2 border-black" style="min-width:0;">
                         <div class="select-container" style="width:110px;flex-shrink:0;">
                             <select class="manga-select-btn text-xs" style="padding:8px 25px 8px 6px;">
@@ -477,7 +477,95 @@
 
         renderGuestFields(1);
 
-        function submitRSVP() {
+        // ★★★ 請把下面的網址換成你部署的 Google Apps Script 網址 ★★★
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwgwTWgIxMkrcF1wP3cfPg3EPHO6895Y3lLV3gXiWYCPP4pLsYIYDozjYPf2-nsuiQT0A/exec';
+
+        async function submitRSVP() {
+            const submitBtn = document.querySelector('#rsvpForm button[type="button"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '送出中...';
+
+            try {
+                // 收集表單資料
+                const attending = document.querySelector('input[name="attending"]:checked').value;
+                const guestCount = document.getElementById('guestCount').value;
+                const parking = document.getElementById('parkingCheck').checked;
+                const message = document.querySelector('textarea').value;
+
+                // 收集賓客資料
+                const guestCards = document.querySelectorAll('.guest-card');
+                const guests = [];
+                guestCards.forEach(card => {
+                    const name = card.querySelector('input[type="text"]').value;
+                    const meal = card.querySelector('select').value;
+                    guests.push({ name: name || '未填', meal: meal || '未選' });
+                });
+
+                // 收集上傳檔案（轉 base64）
+                const fileInput = document.getElementById('fileUpload');
+                const files = [];
+                if (fileInput.files.length > 0) {
+                    for (let i = 0; i < fileInput.files.length; i++) {
+                        const file = fileInput.files[i];
+                        // 限制每個檔案 10MB
+                        if (file.size > 10 * 1024 * 1024) {
+                            alert(`檔案 ${file.name} 超過 10MB，已跳過`);
+                            continue;
+                        }
+                        const base64 = await fileToBase64(file);
+                        files.push({
+                            name: file.name,
+                            type: file.type,
+                            content: base64
+                        });
+                    }
+                }
+
+                const payload = {
+                    attending,
+                    guestCount: attending === 'yes' ? guestCount : 0,
+                    guests: attending === 'yes' ? guests : [],
+                    parking,
+                    message,
+                    files
+                };
+
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showSuccessModal();
+                } else {
+                    alert('送出失敗，請稍後再試');
+                }
+            } catch (error) {
+                console.error(error);
+                // 如果還沒設定 Apps Script 網址，直接顯示成功
+                if (GOOGLE_SCRIPT_URL.includes('在這裡')) {
+                    showSuccessModal();
+                } else {
+                    alert('送出失敗，請稍後再試');
+                }
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '提交回覆 <span class="text-xs opacity-70">SEND</span>';
+            }
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function showSuccessModal() {
             const successModal = document.createElement('div');
             successModal.className = "fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-6";
             successModal.innerHTML = `

@@ -171,18 +171,14 @@
         }
 
         /* 跳動愛心列 - 漫畫卡格感 */
-        .hearts-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
+        .hearts-bar-static {
             display: flex;
             justify-content: center;
             gap: 8px;
             padding: 8px 0;
-            background: linear-gradient(transparent, rgba(0,0,0,0.15));
+            background: var(--manga-white);
         }
-        .hearts-bar span {
+        .hearts-bar-static span {
             color: rgba(0,0,0,0.25);
             font-size: 8px;
             display: inline-block;
@@ -234,18 +230,13 @@
 
     <div class="mobile-frame">
         <!-- 封面區域 -->
-        <section class="relative overflow-hidden pt-12 pb-8 focus-lines">
+        <section class="relative overflow-hidden pt-8 pb-4 focus-lines">
             <div class="text-center relative z-10 px-4">
                 <div class="inline-block border-4 border-black p-2 bg-white mb-4">
                     <p class="text-xs font-black tracking-widest italic uppercase">Wedding Invitation</p>
                 </div>
                 <h1 class="text-4xl font-black mb-3">張育安 × 許雯</h1>
-                <p class="text-xs font-bold text-gray-500 tracking-widest mb-4">YU-AN CHANG &ensp;×&ensp; WEN HSU</p>
-                <div class="bg-black text-white inline-block px-4 py-2 font-black italic">
-                    <span class="text-xl">2027.01.31 (SUN)</span>
-                    <span class="text-sm ml-2">午宴</span>
-                    <span class="text-[10px] ml-1 opacity-70">Lunch Reception</span>
-                </div>
+                <p class="text-xs font-bold text-gray-500 tracking-widest mb-2">YU-AN CHANG &ensp;×&ensp; WEN HSU</p>
             </div>
         </section>
 
@@ -255,22 +246,31 @@
             <div class="onomatopoeia text-5xl top-4 left-3 rotate-[-12deg] pulse-text">ドキドキ</div>
             <div class="onomatopoeia text-3xl top-16 right-3 rotate-[8deg] pulse-text-delay">キュン</div>
             
-            <!-- 跳動愛心 -->
-            <div class="hearts-bar">
-                <span style="animation-delay:0s">♥</span>
-                <span style="animation-delay:0.15s">♥</span>
-                <span style="animation-delay:0.3s">♥</span>
-                <span style="animation-delay:0.45s">♥</span>
-                <span style="animation-delay:0.6s">♥</span>
-                <span style="animation-delay:0.75s">♥</span>
-                <span style="animation-delay:0.9s">♥</span>
-                <span style="animation-delay:1.05s">♥</span>
-                <span style="animation-delay:1.2s">♥</span>
-                <span style="animation-delay:1.35s">♥</span>
-                <span style="animation-delay:1.5s">♥</span>
-                <span style="animation-delay:1.65s">♥</span>
+            <!-- 日期資訊 -->
+            <div style="position:absolute;bottom:0;left:0;right:0;text-align:center;padding:10px 0;background:linear-gradient(transparent, rgba(0,0,0,0.6));">
+                <div class="bg-black text-white inline-block px-4 py-2 font-black italic">
+                    <span class="text-xl">2027.01.31 (SUN)</span>
+                    <span class="text-sm ml-2">午宴</span>
+                    <span class="text-[10px] ml-1 opacity-70">Lunch Reception</span>
+                </div>
             </div>
         </section>
+
+        <!-- 跳動愛心 -->
+        <div class="hearts-bar-static">
+            <span style="animation-delay:0s">♥</span>
+            <span style="animation-delay:0.15s">♥</span>
+            <span style="animation-delay:0.3s">♥</span>
+            <span style="animation-delay:0.45s">♥</span>
+            <span style="animation-delay:0.6s">♥</span>
+            <span style="animation-delay:0.75s">♥</span>
+            <span style="animation-delay:0.9s">♥</span>
+            <span style="animation-delay:1.05s">♥</span>
+            <span style="animation-delay:1.2s">♥</span>
+            <span style="animation-delay:1.35s">♥</span>
+            <span style="animation-delay:1.5s">♥</span>
+            <span style="animation-delay:1.65s">♥</span>
+        </div>
 
         <!-- 地點資訊 -->
         <section class="p-6">
@@ -293,8 +293,8 @@
 
         <!-- 照片輪播區 -->
         <section class="p-6 relative">
-            <div class="onomatopoeia text-lg top-2 right-8 rotate-[12deg] opacity-30">キラキラ</div>
-            <div class="onomatopoeia text-lg bottom-8 left-4 rotate-[-10deg] opacity-25">ジャーン</div>
+            <div class="onomatopoeia text-lg top-2 right-8 rotate-[12deg] opacity-30" style="text-shadow:none;">キラキラ</div>
+            <div class="onomatopoeia text-lg bottom-8 left-4 rotate-[-10deg] opacity-25" style="text-shadow:none;">ジャーン</div>
             <div class="relative">
                 <div class="photo-carousel" id="photoCarousel">
                     <img src="O60A5243.jpg" alt="">

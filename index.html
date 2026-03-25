@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>張育安 & 許雯 Wedding Invitation</title>
     <meta property="og:title" content="張育安 & 許雯 Wedding Invitation">
     <meta property="og:description" content="2027.01.31 (SUN) 午宴｜We're getting married!">
@@ -20,11 +20,13 @@
         .manga-panel { border: 5px solid var(--manga-black); margin: 10px; background: white; position: relative; }
         .onomatopoeia { font-family: 'Noto Sans JP', sans-serif; font-weight: 900; font-style: italic; position: absolute; z-index: 10; text-shadow: 4px 4px 0 white, -2px -2px 0 white, 2px -2px 0 white, -2px 2px 0 white; color: black; pointer-events: none; line-height: 1; }
         .focus-lines { background: repeating-conic-gradient(from 0deg, #fff 0deg 2deg, #eee 2deg 4deg); }
-        .manga-select-btn { appearance: none; width: 100%; background-color: white; border: 4px solid black; padding: 15px; font-weight: 900; font-size: 1rem; cursor: pointer; outline: none; transition: transform 0.1s; }
+        .manga-select-btn { appearance: none; -webkit-appearance: none; width: 100%; background-color: white; border: 4px solid black; padding: 15px; font-weight: 900; font-size: 16px; cursor: pointer; outline: none; transition: transform 0.1s; touch-action: manipulation; }
         .manga-select-btn:active { transform: scale(0.98); background-color: #f0f0f0; }
         .select-container { position: relative; }
         .select-container::after { content: "▼"; position: absolute; right: 15px; top: 50%; transform: translateY(-50%); pointer-events: none; font-weight: 900; }
         .guest-card { border: 3px solid black; padding: 10px; margin-bottom: 10px; box-shadow: 5px 5px 0 rgba(0,0,0,1); background: white; }
+        input[type="text"], textarea, select { font-size: 16px !important; touch-action: manipulation; }
+        button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         .pulse-text { animation: pulse 1.5s steps(4) infinite; }
         .pulse-text-delay { animation: pulse2 1.5s steps(4) infinite; animation-delay: 0.5s; }
         @keyframes pulse { 0%, 100% { transform: rotate(-12deg) scale(1); opacity: 1; } 50% { transform: rotate(-12deg) scale(1.15); opacity: 0.85; } }
@@ -135,12 +137,12 @@
                     </div>
                     <div id="guestList"></div>
                     <div>
-                        <label class="flex items-center gap-3 cursor-pointer" onclick="toggleParking()">
+                        <div class="flex items-center gap-3 cursor-pointer" id="parkingLabel" style="touch-action:manipulation;">
                             <div id="parkingBox" class="w-8 h-8 border-4 border-black flex items-center justify-center transition text-lg font-black"></div>
                             <input type="checkbox" id="parkingCheck" class="hidden">
                             <span class="font-black text-lg">需要停車位</span>
                             <span class="text-[10px] text-gray-400 font-bold ml-1">PARKING</span>
-                        </label>
+                        </div>
                     </div>
                 </div>
                 <div class="space-y-6">
@@ -232,6 +234,10 @@
             box.style.color = cb.checked ? 'white' : 'black';
             box.textContent = cb.checked ? '✓' : '';
         }
+        document.getElementById('parkingLabel').addEventListener('click', function(e) {
+            e.preventDefault();
+            toggleParking();
+        });
 
         // 輪播
         var carousel = document.getElementById('photoCarousel');
@@ -276,9 +282,9 @@
                 }
                 card.innerHTML = '<div class="flex items-center gap-2">'
                     + '<span class="bg-black text-white text-xs px-2 py-1 font-black whitespace-nowrap">GUEST ' + i + '</span>'
-                    + '<input type="text" placeholder="姓名" class="flex-1 font-black outline-none text-sm border-b-2 border-black" style="min-width:0;">'
+                    + '<input type="text" placeholder="姓名" class="flex-1 font-black outline-none border-b-2 border-black" style="min-width:0;font-size:16px;padding:4px 0;">'
                     + '<div class="select-container" style="width:110px;flex-shrink:0;">'
-                    + '<select class="manga-select-btn text-xs" style="padding:8px 25px 8px 6px;">'
+                    + '<select class="manga-select-btn" style="padding:8px 25px 8px 6px;font-size:12px;">'
                     + optionsHtml
                     + '</select></div></div>';
                 guestListContainer.appendChild(card);
@@ -312,6 +318,21 @@
 
             var guestCards = document.querySelectorAll('.guest-card');
             var guests = [];
+
+            // 驗證餐點是否都有選（僅參加時）
+            if (attending === 'yes') {
+                for (var v = 0; v < guestCards.length; v++) {
+                    var checkMeal = guestCards[v].querySelector('select');
+                    if (checkMeal.selectedIndex === 0) {
+                        alert('請為 GUEST ' + (v + 1) + ' 選擇餐點！');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '提交回覆 <span class="text-xs opacity-70">SEND</span>';
+                        checkMeal.focus();
+                        return;
+                    }
+                }
+            }
+
             for (var g = 0; g < guestCards.length; g++) {
                 var nameInput = guestCards[g].querySelector('input[type="text"]');
                 var mealSelect = guestCards[g].querySelector('select');
